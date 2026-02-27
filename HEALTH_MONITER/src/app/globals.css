@@ -1,0 +1,175 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap");
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 222 47% 6%;
+    --foreground: 213 31% 91%;
+    --card: 222 47% 9%;
+    --card-foreground: 213 31% 91%;
+    --popover: 222 47% 9%;
+    --popover-foreground: 213 31% 91%;
+    --primary: 189 94% 43%;
+    --primary-foreground: 222 47% 6%;
+    --secondary: 222 47% 12%;
+    --secondary-foreground: 213 31% 91%;
+    --muted: 222 47% 12%;
+    --muted-foreground: 215 16% 55%;
+    --accent: 222 47% 15%;
+    --accent-foreground: 213 31% 91%;
+    --destructive: 0 63% 55%;
+    --destructive-foreground: 213 31% 91%;
+    --border: 222 47% 15%;
+    --input: 222 47% 15%;
+    --ring: 189 94% 43%;
+    --radius: 0.75rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-feature-settings: "rlig" 1, "calt" 1;
+    background: #060b16;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.02);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: rgba(6, 182, 212, 0.3);
+    border-radius: 3px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(6, 182, 212, 0.5);
+  }
+
+  ::selection {
+    background: rgba(6, 182, 212, 0.3);
+    color: #fff;
+  }
+}
+
+@layer components {
+  .glass-card {
+    @apply rounded-xl border border-white/5 backdrop-blur-md;
+    background-color: rgba(255, 255, 255, 0.03);
+    background: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.05) 0%,
+      rgba(255, 255, 255, 0.02) 100%
+    );
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  }
+
+  .glass-sidebar {
+    background: linear-gradient(
+      180deg,
+      rgba(6, 11, 22, 0.95) 0%,
+      rgba(6, 11, 22, 0.98) 100%
+    );
+    backdrop-filter: blur(20px);
+    border-right: 1px solid rgba(255, 255, 255, 0.05);
+  }
+
+  .gradient-text {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(135deg, #06b6d4, #3b82f6);
+  }
+
+  .glow-cyan {
+    box-shadow: 0 0 20px rgba(6, 182, 212, 0.25), 0 0 60px rgba(6, 182, 212, 0.1);
+  }
+
+  .glow-red {
+    box-shadow: 0 0 20px rgba(239, 68, 68, 0.3), 0 0 60px rgba(239, 68, 68, 0.1);
+  }
+
+  .glow-green {
+    box-shadow: 0 0 20px rgba(34, 197, 94, 0.25), 0 0 60px rgba(34, 197, 94, 0.1);
+  }
+
+  .glow-orange {
+    box-shadow: 0 0 20px rgba(249, 115, 22, 0.3), 0 0 60px rgba(249, 115, 22, 0.1);
+  }
+
+  .nav-item-active {
+    @apply text-cyan-400;
+    background: linear-gradient(90deg, rgba(6, 182, 212, 0.15) 0%, rgba(6, 182, 212, 0.05) 100%);
+    border-left: 2px solid #06b6d4;
+  }
+
+  .shimmer-bg {
+    background: linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.03) 25%,
+      rgba(255, 255, 255, 0.07) 50%,
+      rgba(255, 255, 255, 0.03) 75%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+  }
+
+  .metric-badge {
+    @apply text-xs font-medium px-2 py-0.5 rounded-full;
+  }
+}
+
+/* Recharts custom styles */
+.recharts-cartesian-grid-horizontal line,
+.recharts-cartesian-grid-vertical line {
+  stroke: rgba(255, 255, 255, 0.05) !important;
+}
+
+.recharts-tooltip-wrapper .custom-tooltip {
+  @apply glass-card;
+  border: 1px solid rgba(6, 182, 212, 0.2) !important;
+}
+
+.recharts-default-tooltip {
+  background: rgba(6, 11, 22, 0.9) !important;
+  border: 1px solid rgba(6, 182, 212, 0.2) !important;
+  border-radius: 8px !important;
+}
+
+/* Leaflet map overrides */
+.leaflet-container {
+  background: #0d1117 !important;
+  border-radius: 12px;
+}
+
+.leaflet-tile {
+  filter: brightness(0.6) saturate(0.8) hue-rotate(180deg);
+}
+
+/* Animations */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes pulse-ring {
+  0% { transform: scale(0.8); opacity: 1; }
+  100% { transform: scale(2); opacity: 0; }
+}
+
+.pulse-ring::before {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 2px solid currentColor;
+  animation: pulse-ring 1.5s ease-out infinite;
+}
