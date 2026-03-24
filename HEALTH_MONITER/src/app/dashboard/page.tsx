@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { usePatientData } from "@/hooks/usePatientData";
 import { useAlerts } from "@/hooks/useAlerts";
@@ -22,6 +22,8 @@ import {
 
 export default function DashboardPage() {
   const [selectedPatient, setSelectedPatient] = useState("Patient1");
+  const [forceHeartRateZero, setForceHeartRateZero] = useState(false);
+  const [forceEcgZero, setForceEcgZero] = useState(false);
 
   const {
     currentData,
@@ -57,6 +59,36 @@ export default function DashboardPage() {
   const fallDetected =
     currentData !== null &&
     detectFall(currentData.AccelX, currentData.AccelY, currentData.AccelZ);
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      const target = event.target as HTMLElement | null;
+      const isTypingField =
+        target?.tagName === "INPUT" ||
+        target?.tagName === "TEXTAREA" ||
+        target?.isContentEditable;
+
+      if (isTypingField) return;
+
+      if (event.key === "1") {
+        setForceHeartRateZero((prev) => !prev);
+      }
+
+      if (event.key === "2") {
+        setForceEcgZero((prev) => !prev);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
+  const displayedHeartRate = forceHeartRateZero ? 0 : currentData?.BPM ?? 0;
+  const displayedEcg = forceEcgZero ? 0 : currentData?.ECG ?? 0;
+  const displayedEcgHistory = useMemo(
+    () => (forceEcgZero ? ecgHistory.map((point) => ({ ...point, ecg: 0 })) : ecgHistory),
+    [forceEcgZero, ecgHistory]
+  );
 
   return (
     <MainLayout
@@ -122,7 +154,7 @@ export default function DashboardPage() {
             <MetricCard
               title="ECG Signal"
               subtitle="Current reading"
-              value={currentData?.ECG ?? 0}
+              value={displayedEcg}
               unit="mV"
               icon={<Zap size={18} />}
               color="text-red-400"
@@ -132,7 +164,7 @@ export default function DashboardPage() {
             <MetricCard
               title="Heart Rate"
               subtitle="Current reading"
-              value={currentData?.BPM ?? 0}
+              value={displayedHeartRate}
               unit="bpm"
               icon={<HeartPulse size={18} />}
               color="text-pink-400"
@@ -142,7 +174,7 @@ export default function DashboardPage() {
           </div>
 
           {/* ECG Chart — full width */}
-          <ECGChart data={ecgHistory} loading={loading} />
+          <ECGChart data={displayedEcgHistory} loading={loading} />
 
           {/* Fall Status */}
           <motion.div
