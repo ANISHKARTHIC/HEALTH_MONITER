@@ -9,7 +9,6 @@ import { TemperatureCard } from "@/components/cards/TemperatureCard";
 import { HumidityCard } from "@/components/cards/HumidityCard";
 import { MetricCard } from "@/components/cards/MetricCard";
 import { ECGChart } from "@/components/charts/ECGChart";
-import { AccelerometerChart } from "@/components/charts/AccelerometerChart";
 import { LocationMap } from "@/components/map/LocationMap";
 import { DashboardSkeleton } from "@/components/ui/LoadingSkeleton";
 import { FirebaseErrorState } from "@/components/ui/EmptyState";
@@ -17,10 +16,8 @@ import { formatTimestamp, detectFall } from "@/lib/utils";
 import {
   Zap,
   Activity,
-  Move3d,
-  RefreshCw,
+  HeartPulse,
   Clock,
-  MapPin,
 } from "lucide-react";
 
 export default function DashboardPage() {
@@ -29,7 +26,6 @@ export default function DashboardPage() {
   const {
     currentData,
     ecgHistory,
-    accelHistory,
     deviceStatus,
     loading,
     error,
@@ -134,23 +130,13 @@ export default function DashboardPage() {
               loading={loading}
             />
             <MetricCard
-              title="Accel Magnitude"
-              subtitle="Total force"
-              value={
-                currentData
-                  ? parseFloat(
-                      Math.sqrt(
-                        currentData.AccelX ** 2 +
-                          currentData.AccelY ** 2 +
-                          currentData.AccelZ ** 2
-                      ).toFixed(2)
-                    )
-                  : 0
-              }
-              unit="g"
-              icon={<Activity size={18} />}
-              color={fallDetected ? "text-red-400" : "text-violet-400"}
-              bgColor={fallDetected ? "bg-red-500/10" : "bg-violet-500/10"}
+              title="Heart Rate"
+              subtitle="Current reading"
+              value={currentData?.BPM ?? 0}
+              unit="bpm"
+              icon={<HeartPulse size={18} />}
+              color="text-pink-400"
+              bgColor="bg-pink-500/10"
               loading={loading}
             />
           </div>
@@ -158,32 +144,36 @@ export default function DashboardPage() {
           {/* ECG Chart — full width */}
           <ECGChart data={ecgHistory} loading={loading} />
 
-          {/* Accelerometer — full width */}
-          <AccelerometerChart data={accelHistory} loading={loading} />
-
-          {/* IMU Metrics Row */}
-          <div className="grid grid-cols-3 gap-3">
-            {[
-              { label: "Accel X", val: currentData?.AccelX ?? 0, color: "text-violet-400", unit: "g" },
-              { label: "Accel Y", val: currentData?.AccelY ?? 0, color: "text-emerald-400", unit: "g" },
-              { label: "Accel Z", val: currentData?.AccelZ ?? 0, color: "text-orange-400", unit: "g" },
-            ].map((m) => (
-              <motion.div
-                key={m.label}
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="glass-card p-3"
-              >
-                <p className="text-[10px] font-semibold text-white/30 uppercase tracking-wider mb-1.5">
-                  {m.label}
+          {/* Fall Status */}
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            className={`glass-card p-4 border ${
+              fallDetected
+                ? "border-red-500/30 glow-red"
+                : "border-emerald-500/20"
+            }`}
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-xs font-semibold text-white/30 uppercase tracking-wider">
+                  Fall Detection
                 </p>
-                <p className={`text-lg font-bold tabular-nums ${m.color}`}>
-                  {(m.val as number).toFixed(3)}
+                <p
+                  className={`text-lg font-bold mt-1 ${
+                    fallDetected ? "text-red-300" : "text-emerald-300"
+                  }`}
+                >
+                  {fallDetected ? "Detected" : "No Fall"}
                 </p>
-                <p className="text-[10px] text-white/20">{m.unit}</p>
-              </motion.div>
-            ))}
-          </div>
+              </div>
+              <div
+                className={`w-3 h-3 rounded-full ${
+                  fallDetected ? "bg-red-400 animate-pulse" : "bg-emerald-400"
+                }`}
+              />
+            </div>
+          </motion.div>
 
           {/* GPS Map */}
           <div className="grid grid-cols-1">
